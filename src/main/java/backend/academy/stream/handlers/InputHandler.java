@@ -6,7 +6,7 @@ import lombok.Getter;
 
 public final class InputHandler {
     @Getter private static final InputHandler INSTANCE = new InputHandler();
-    private static Scanner scanner = new Scanner(System.in);
+    private static Scanner scanner;
 
     private InputHandler() {
     }

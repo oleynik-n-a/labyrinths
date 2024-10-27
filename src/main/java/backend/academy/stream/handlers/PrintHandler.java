@@ -1,27 +1,25 @@
 package backend.academy.stream.handlers;
 
-import backend.academy.models.Maze;
 import java.io.PrintStream;
 import lombok.Getter;
 import lombok.Setter;
 
 public final class PrintHandler {
     @Getter private static final PrintHandler INSTANCE = new PrintHandler();
-    @Setter static PrintStream printStream = System.out;
+    static PrintStream printStream;
 
     private PrintHandler() {
     }
 
-    public void printMessage(String message) {
-        printStream.println(message);
+    public void setPrintStream(PrintStream printStream) {
+        PrintHandler.printStream = printStream;
     }
 
-    public void printMaze(Maze maze) {
-        for (int i = 0; i < maze.height(); ++i) {
-            for (int j = 0; j < maze.width(); ++j) {
-                printStream.print(maze.cells()[i][j].surface().value());
-            }
-            printStream.println();
-        }
+    public void printMessage(String message) {
+        printStream.print(message);
+    }
+
+    public void printMessageLn(String message) {
+        printStream.println(message);
     }
 }
