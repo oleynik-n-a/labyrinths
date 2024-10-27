@@ -1,8 +1,18 @@
 package backend.academy.models;
 
+import lombok.Getter;
+
 public enum SurfaceType {
-    WALL,
-    SLUSH,
-    PATH,
-    ROAD
+    WALL("⬜"),
+    PATHWAY("⬛"),
+    STAR("⭐"),
+    SOLUTION("✅"),
+    START("⛺"),
+    FINISH("⛳");
+
+    @Getter private final String value;
+
+    SurfaceType(final String value) {
+        this.value = value;
+    }
 }
