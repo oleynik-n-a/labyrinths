@@ -19,7 +19,7 @@ public class PrintHandler {
     public void printMaze(Maze maze) {
         for (int i = 0; i < maze.height(); ++i) {
             for (int j = 0; j < maze.width(); ++j) {
-                printStream.print(maze.cells()[i][j]);
+                printStream.print(maze.cells()[i][j].surface().value());
             }
             printStream.println();
         }
