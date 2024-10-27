@@ -17,4 +17,15 @@ import lombok.Setter;
     public int width() {
         return cells[0].length;
     }
+
+    public String toString() {
+        StringBuilder printableMaze = new StringBuilder();
+        for (int i = 0; i < height(); ++i) {
+            for (int j = 0; j < width(); ++j) {
+                printableMaze.append(cells[i][j].surface().value());
+            }
+            printableMaze.append("\n");
+        }
+        return printableMaze.toString();
+    }
 }
