@@ -1,11 +1,11 @@
 package backend.academy.stream.handlers;
 
 import backend.academy.models.Maze;
+import java.io.PrintStream;
 import lombok.Getter;
 import lombok.Setter;
-import java.io.PrintStream;
 
-public class PrintHandler {
+public final class PrintHandler {
     @Getter private static final PrintHandler INSTANCE = new PrintHandler();
     @Setter static PrintStream printStream = System.out;
 

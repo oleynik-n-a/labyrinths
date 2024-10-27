@@ -1,8 +1,8 @@
 package backend.academy.stream.handlers;
 
-import lombok.Getter;
 import java.io.InputStream;
 import java.util.Scanner;
+import lombok.Getter;
 
 public final class InputHandler {
     @Getter private static final InputHandler INSTANCE = new InputHandler();
