@@ -1,8 +1,4 @@
 package backend.academy.models;
 
-public enum Cell {
-    WALL,
-    SLUSH,
-    PATH,
-    ROAD
+public record Cell(Position position, SurfaceType surfaceType) {
 }
