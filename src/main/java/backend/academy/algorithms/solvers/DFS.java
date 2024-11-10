@@ -2,61 +2,71 @@ package backend.academy.algorithms.solvers;
 
 import backend.academy.algorithms.exceptions.NoWayFoundException;
 import backend.academy.models.Maze;
-import backend.academy.models.SurfaceType;
+import backend.academy.models.Cell;
 
 public class DFS implements SolverAlgorithm {
     @Override
     public void execute(Maze maze) throws NoWayFoundException {
         boolean[][] visited = new boolean[maze.height()][maze.width()];
-        int y1 = -1, x1 = -1;
-        for (int x = 0; x < maze.height(); x++) {
-            for (int y = 0; y < maze.width(); y++) {
-                if (maze.cells()[y][x].surface() == SurfaceType.WALL) {
+        int startY = -1, startX = -1;
+        boolean hasFinishPosition = false;
+
+        for (int y = 0; y < maze.height(); y++) {
+            for (int x = 0; x < maze.width(); x++) {
+                if (maze.getSurface(y, x) == Cell.WALL) {
                     visited[y][x] = true;
                 }
-                if (maze.cells()[y][x].surface() == SurfaceType.START) {
-                    y1 = y;
-                    x1 = x;
+                if (maze.getSurface(y, x) == Cell.START) {
+                    startY = y;
+                    startX = x;
+                }
+                if (maze.getSurface(y, x) == Cell.FINISH) {
+                    hasFinishPosition = true;
                 }
             }
         }
-        if (!dfs(maze, visited, y1, x1)) {
+
+        if (!hasFinishPosition || startY == -1) {
+            throw new NoWayFoundException("Start or finish not set");
+        }
+
+        if (!dfs(maze, visited, startY, startX)) {
             throw new NoWayFoundException("There is no such way");
         }
     }
 
-    private boolean dfs(Maze maze, boolean[][] visited, int y1, int x1) {
-        if (visited[y1][x1]) {
+    private boolean dfs(Maze maze, boolean[][] visited, int y, int x) {
+        if (visited[y][x]) {
             return false;
         }
 
-        visited[y1][x1] = true;
+        visited[y][x] = true;
 
-        if (maze.cells()[y1][x1].surface() == SurfaceType.FINISH) {
+        if (maze.getSurface(y, x) == Cell.FINISH) {
             return true;
         }
 
-        if (y1 != 0 && dfs(maze, visited,y1 - 1, x1)) {
-            if (maze.cells()[y1][x1].surface() == SurfaceType.PATHWAY) {
-                maze.cells()[y1][x1].surface(SurfaceType.SOLUTION);
+        if (y != 0 && dfs(maze, visited,y - 1, x)) {
+            if (maze.getSurface(y, x) == Cell.PATHWAY) {
+                maze.setSurface(y, x, Cell.SOLUTION);
             }
             return true;
         }
-        if (x1 != 0 && dfs(maze, visited, y1, x1 - 1)) {
-            if (maze.cells()[y1][x1].surface() == SurfaceType.PATHWAY) {
-                maze.cells()[y1][x1].surface(SurfaceType.SOLUTION);
+        if (x != 0 && dfs(maze, visited, y, x - 1)) {
+            if (maze.getSurface(y, x) == Cell.PATHWAY) {
+                maze.setSurface(y, x, Cell.SOLUTION);
             }
             return true;
         }
-        if (y1 != maze.height() - 1 && dfs(maze, visited, y1 + 1, x1)) {
-            if (maze.cells()[y1][x1].surface() == SurfaceType.PATHWAY) {
-                maze.cells()[y1][x1].surface(SurfaceType.SOLUTION);
+        if (y != maze.height() - 1 && dfs(maze, visited, y + 1, x)) {
+            if (maze.getSurface(y, x) == Cell.PATHWAY) {
+                maze.setSurface(y, x, Cell.SOLUTION);
             }
             return true;
         }
-        if (x1 != maze.width() - 1 && dfs(maze, visited, y1, x1 + 1)) {
-            if (maze.cells()[y1][x1].surface() == SurfaceType.PATHWAY) {
-                maze.cells()[y1][x1].surface(SurfaceType.SOLUTION);
+        if (x != maze.width() - 1 && dfs(maze, visited, y, x + 1)) {
+            if (maze.getSurface(y, x) == Cell.PATHWAY) {
+                maze.setSurface(y, x, Cell.SOLUTION);
             }
             return true;
         }

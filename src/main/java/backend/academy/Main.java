@@ -1,5 +1,6 @@
 package backend.academy;
 
+import backend.academy.algorithms.exceptions.MazeException;
 import backend.academy.logic.ApplicationProcessor;
 import backend.academy.stream.handlers.InputHandler;
 import backend.academy.stream.handlers.PrintHandler;
@@ -16,19 +17,16 @@ public class Main {
         ApplicationProcessor applicationProcessor = new ApplicationProcessor(inputHandler, printHandler);
 
         while (true) {
-            printHandler.printMessageLn(applicationProcessor.getApplicationMenu());
+            printHandler.printMessage(applicationProcessor.getApplicationMenu());
             Integer input = inputHandler.tryReadInteger();
             if (input == null) {
                 continue;
             }
-            String response = applicationProcessor.sendCommand(input);
-            if (response != null) {
-                printHandler.printMessageLn(response);
+            try {
+                applicationProcessor.executeCommand(input);
+            } catch (MazeException e) {
+                printHandler.printMessageLn(e.getMessage());
             }
         }
-//        Cell[][] cells = {{new Cell(SurfaceType.START), new Cell(SurfaceType.WALL), new Cell(SurfaceType.PATHWAY), new Cell(SurfaceType.PATHWAY)},
-//            {new Cell(SurfaceType.PATHWAY), new Cell(SurfaceType.STAR), new Cell(SurfaceType.PATHWAY), new Cell(SurfaceType.WALL)},
-//            {new Cell(SurfaceType.PATHWAY), new Cell(SurfaceType.WALL), new Cell(SurfaceType.FINISH), new Cell(SurfaceType.WALL)},
-//            {new Cell(SurfaceType.PATHWAY), new Cell(SurfaceType.PATHWAY), new Cell(SurfaceType.PATHWAY), new Cell(SurfaceType.WALL)}};
     }
 }

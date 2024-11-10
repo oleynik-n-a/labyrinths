@@ -1,13 +1,15 @@
 package backend.academy.models;
 
-import lombok.Getter;
-import lombok.Setter;
+public class Maze {
+    private final Cell[][] cells;
 
-@Getter @Setter public class Maze {
-    private Cell[][] cells;
-
-    public Maze(Cell[][] cells) {
-        this.cells = cells;
+    public Maze(int height, int width) {
+        this.cells = new Cell[height][width];
+        for (int y = 0; y < height; y++) {
+            for (int x = 0; x < width; x++) {
+                setSurface(y, x, Cell.WALL);
+            }
+        }
     }
 
     public int height() {
@@ -18,11 +20,42 @@ import lombok.Setter;
         return cells[0].length;
     }
 
+    public Cell getSurface(int y, int x) {
+        return cells[y][x];
+    }
+
+    public void setSurface(int y, int x, Cell surface) {
+        cells[y][x] = surface;
+    }
+
+    public void setSurface(Position position, Cell surface) {
+        setSurface(position.y(), position.x(), surface);
+    }
+
+    public void clearMaze() {
+        for (int y = 0; y < height(); y++) {
+            for (int x = 0; x < width(); x++) {
+                setSurface(y, x, Cell.WALL);
+            }
+        }
+    }
+
+    public void clearMazeObjects(Cell cell) {
+        for (int y = 0; y < height(); y++) {
+            for (int x = 0; x < width(); x++) {
+                if (cells[y][x] == cell) {
+                    setSurface(y, x, Cell.PATHWAY);
+                }
+            }
+        }
+    }
+
     public String toString() {
         StringBuilder printableMaze = new StringBuilder();
-        for (int i = 0; i < height(); ++i) {
-            for (int j = 0; j < width(); ++j) {
-                printableMaze.append(cells[i][j].surface().value());
+        printableMaze.append("\n");
+        for (int y = 0; y < height(); ++y) {
+            for (int x = 0; x < width(); ++x) {
+                printableMaze.append(cells[y][x].value());
             }
             printableMaze.append("\n");
         }

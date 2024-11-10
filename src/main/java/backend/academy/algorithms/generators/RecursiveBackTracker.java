@@ -1,52 +1,50 @@
 package backend.academy.algorithms.generators;
 
-import backend.academy.models.Cell;
 import backend.academy.models.Maze;
 import backend.academy.models.Position;
-import backend.academy.models.SurfaceType;
-import org.checkerframework.checker.units.qual.C;
-import org.openjdk.jmh.generators.core.GenerationException;
+import backend.academy.models.Cell;
 import java.security.SecureRandom;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 
 public class RecursiveBackTracker implements GeneratorAlgorithm {
+    private static final int[][] DIRECTIONS = {
+        {0, -2},
+        {0, 2},
+        {-2, 0},
+        {2, 0}
+    };
+
+
     @Override
-    public void execute(Maze maze) throws GenerationException {
-        if (maze == null) {
-            maze = new Maze(new Cell[10][10]);
-            for (int i = 0; i < 10; i++) {
-                for (int j = 0; j < 10; j++) {
-                    maze.cells()[i][j] = new Cell(SurfaceType.WALL);
-                }
-            }
-        }
-
-        for (int i = 0; i < maze.height(); i++) {
-            for (int j = 0; j < maze.width(); j++) {
-                maze.cells()[i][j].surface(SurfaceType.WALL);
-            }
-        }
-
+    public void execute(Maze maze) {
+        maze.clearMaze();
         SecureRandom random = new SecureRandom();
-        Position start = new Position(random.nextInt(1, maze.width() - 1), random.nextInt(1, maze.height() - 1));
+        Position start = new Position(random.nextInt(maze.height() / 2) * 2 + 1, random.nextInt(maze.width() / 2) * 2 + 1);
 
-        dfs(maze, random, start.y(), start.x());
+        dfs(maze, start.y(), start.x());
     }
 
-    private void dfs(Maze maze, SecureRandom random, int y1, int x1) {
-        int num = random.nextInt(4);
-        maze.cells()[y1][x1].surface(SurfaceType.PATHWAY);
+    private void dfs(Maze maze, int y, int x) {
+        maze.setSurface(y, x, Cell.PATHWAY);
 
-        if (y1 > 1 && num == 0 && maze.cells()[y1 - 1][x1].surface() != SurfaceType.PATHWAY) {
-            dfs(maze, random, y1 - 1, x1);
-        }
-        if (x1 > 1 && num == 1 && maze.cells()[y1][x1 - 1].surface() != SurfaceType.PATHWAY) {
-            dfs(maze, random, y1, x1 - 1);
-        }
-        if (y1 < maze.height() - 1 && num == 0 && maze.cells()[y1 + 1][x1].surface() != SurfaceType.PATHWAY) {
-            dfs(maze, random, y1 + 1, x1);
-        }
-        if (x1 < maze.width() && num == 0 && maze.cells()[y1][x1 + 1].surface() != SurfaceType.PATHWAY) {
-            dfs(maze, random, y1, x1 + 1);
+        List<int[]> dirs = Arrays.asList(DIRECTIONS.clone());
+        Collections.shuffle(dirs);
+
+        for (int[] dir : dirs) {
+            int dx = dir[0];
+            int dy = dir[1];
+
+            int newY = y + dy;
+            int newX = x + dx;
+
+            if (newY > 0 && newY < maze.height() && newX > 0 && newX < maze.width()) {
+                if (maze.getSurface(newY, newX) == Cell.WALL) {
+                    maze.setSurface(y + dy / 2, x + dx / 2, Cell.PATHWAY);
+                    dfs(maze, newY, newX);
+                }
+            }
         }
     }
 

@@ -1,13 +1,18 @@
 package backend.academy.models;
 
 import lombok.Getter;
-import lombok.Setter;
 
-@Getter public class Cell {
-    @Setter private SurfaceType surface;
-    private Position position;
+@Getter public enum Cell {
+    WALL("⬜"),
+    PATHWAY("⬛"),
+    STAR("⭐"),
+    SOLUTION("✅"),
+    START("⛺"),
+    FINISH("⛳");
 
-    public Cell(SurfaceType surface) {
-        this.surface = surface;
+    private final String value;
+
+    Cell(final String value) {
+        this.value = value;
     }
 }

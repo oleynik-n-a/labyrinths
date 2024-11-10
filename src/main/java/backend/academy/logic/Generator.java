@@ -1,7 +1,8 @@
 package backend.academy.logic;
 
-import backend.academy.algorithms.exceptions.GenerationErrorException;
+import backend.academy.algorithms.exceptions.MazeException;
 import backend.academy.algorithms.generators.GeneratorAlgorithm;
+import backend.academy.algorithms.generators.Kruskal;
 import backend.academy.algorithms.generators.RecursiveBackTracker;
 import backend.academy.algorithms.generators.StarGenerator;
 import backend.academy.models.Maze;
@@ -12,7 +13,7 @@ public final class Generator {
     private final StarGenerator starGenerator;
 
     public Generator() {
-        this.algorithms = new GeneratorAlgorithm[]{new RecursiveBackTracker(), new RecursiveBackTracker()};
+        this.algorithms = new GeneratorAlgorithm[]{new RecursiveBackTracker(), new Kruskal()};
         this.starGenerator = new StarGenerator();
     }
 
@@ -31,21 +32,17 @@ public final class Generator {
         return algorithms[current + 1 == algorithms.length ? 0 : current + 1];
     }
 
-    public String generate(Maze maze) {
-        try {
-            algorithms[current].execute(maze);
-        } catch (GenerationErrorException e) {
-            return e.getMessage();
+    public void generate(Maze maze) {
+        if (maze == null) {
+            throw new MazeException("Height or width not set");
         }
-        return null;
+        algorithms[current].execute(maze);
     }
 
-    public String generateStars(Maze maze) {
-        try {
-            starGenerator.execute(maze);
-        } catch (GenerationErrorException e) {
-            return e.getMessage();
+    public void generateStars(Maze maze) {
+        if (maze == null) {
+            throw new MazeException("Height or width not set");
         }
-        return null;
+        starGenerator.execute(maze);
     }
 }

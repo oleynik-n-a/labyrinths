@@ -1,8 +1,9 @@
 package backend.academy.logic;
 
+import backend.academy.algorithms.exceptions.MazeException;
 import backend.academy.models.Maze;
 import backend.academy.models.Position;
-import backend.academy.models.SurfaceType;
+import backend.academy.models.Cell;
 import backend.academy.stream.handlers.InputHandler;
 import backend.academy.stream.handlers.PrintHandler;
 
@@ -10,11 +11,11 @@ public class ApplicationProcessor {
     private final InputHandler inputHandler;
     private final PrintHandler printHandler;
 
-    private final Maze maze = null;
-    private final Position startPosition = new Position(2, 2);
-    private final Position finishPosition = new Position(5, 5);
-    private int height = 10;
-    private int width = 10;
+    private Maze maze = null;
+    private Position startPosition = null;
+    private Position finishPosition = null;
+    private Integer height = null;
+    private Integer width = null;
     private final Generator generator = new Generator();
     private final Solver solver = new Solver();
 
@@ -25,30 +26,31 @@ public class ApplicationProcessor {
 
     public String getApplicationMenu() {
         return String.format("""
-            Welcome to maze generator application!
 
+            Welcome to maze generator application!
             %s
 
             Menu:
             \t1. Switch generator algorithm: %s (--> %s).
             \t2. Switch solver algorithm: %s (--> %s).
-            \t3. Set start position.
-            \t4. Set finish position.
-            \t5. Set height: %d.
-            \t6. Set width: %d.
-            \t7. Generate stars.
-            \t8. Generate maze.
+            \t3. Set height: %d.
+            \t4. Set width: %d.
+            \t5. Generate maze.
+            \t6. Generate stars.
+            \t7. Set start position.
+            \t8. Set finish position.
             \t9. Solve maze.
-            \t10. Exit.
+            \t10. Solve maze with all stars.
+            \t11. Exit.
 
-
-            """,
-            (maze == null ? "" : maze.toString()), generator.algorithm().toString(), generator.nextAlgorithm().toString(),
-            solver.algorithm().toString(), solver.nextAlgorithm().toString(), height, width
+            Input:\s""",
+            (maze == null ? "" : maze.toString()), generator.algorithm().toString(),
+            generator.nextAlgorithm().toString(), solver.algorithm().toString(), solver.nextAlgorithm().toString(),
+            height, width
         );
     }
 
-    public String sendCommand(int num) {
+    public void executeCommand(int num) {
         switch (num) {
             case 1:
                 generator.switchAlgorithm();
@@ -57,78 +59,111 @@ public class ApplicationProcessor {
                 solver.switchAlgorithm();
                 break;
             case 3:
-                setStartPosition();
-                break;
-            case 4:
-                setFinishPosition();
-                break;
-            case 5:
                 setHeight();
                 break;
-            case 6:
+            case 4:
                 setWidth();
                 break;
+            case 5:
+                generator.generate(maze);
+                break;
+            case 6:
+                generator.generateStars(maze);
+                break;
             case 7:
-                return generator.generateStars(maze);
+                setStartPosition();
+                break;
             case 8:
-                return generator.generate(maze);
+                setFinishPosition();
+                break;
             case 9:
-                return solver.solve(maze);
+                solver.solve(maze);
+                break;
             case 10:
+                solver.solveWithStars(maze);
+                break;
+            case 11:
                 System.exit(0);
         }
-        return null;
+        if (height != null && width != null && (maze == null || maze.height() != height || maze.width() != width)) {
+            maze = new Maze(height, width);
+        }
     }
 
-    private void setPosition(Position position) {
-        printHandler.printMessage("Input y: ");
+    private Position setPosition() {
+        if (height == null || width == null) {
+            throw new MazeException("Height or width not set");
+        }
+
+        printHandler.printMessage(String.format("Input y (0 < y < %d): ", height - 1));
         Integer y = inputHandler.tryReadInteger();
-        printHandler.printMessage("Input x: ");
+        printHandler.printMessage(String.format("Input y (0 < y < %d): ", width - 1));
         Integer x = inputHandler.tryReadInteger();
 
         if (y == null || x == null || y < 0 || x < 0 || y >= height || x >= width) {
-            return;
+            throw new MazeException("Incorrect x or y");
+        }
+        if (maze.getSurface(y, x) == Cell.WALL) {
+            throw new MazeException("Start or finish position can't be in the wall");
         }
 
-        position.y(y);
-        position.x(x);
-
-        if (maze != null && maze.cells()[position.y()][position.x()].surface() == SurfaceType.PATHWAY) {
-            for (int i = 0; i < maze.height() + height; i++) {
-                for (int j = 0; j < maze.width() + width; j++) {
-                    if (maze.cells()[i][j].surface() == SurfaceType.START) {
-                        maze.cells()[position.y()][position.x()].surface(SurfaceType.START);
-                        maze.cells()[i][j].surface(SurfaceType.PATHWAY);
-                        return;
-                    }
-                }
-            }
-        }
+        return new Position(y, x);
     }
 
     private void setStartPosition() {
-        setPosition(startPosition);
+        if (maze == null) {
+            throw new MazeException("Height or width not set");
+        }
+
+        startPosition = setPosition();
+        maze.clearMazeObjects(Cell.SOLUTION);
+        maze.clearMazeObjects(Cell.START);
+        maze.setSurface(startPosition, Cell.START);
     }
 
     private void setFinishPosition() {
-        setPosition(finishPosition);
+        if (maze == null) {
+            throw new MazeException("Height or width not set");
+        }
+
+        finishPosition = setPosition();
+        maze.clearMazeObjects(Cell.SOLUTION);
+        maze.clearMazeObjects(Cell.FINISH);
+        maze.setSurface(finishPosition, Cell.FINISH);
     }
 
     private void setHeight() {
-        printHandler.printMessage("Input height: ");
+        printHandler.printMessage("Input odd height (5 < height < 40): ");
         Integer height = inputHandler.tryReadInteger();
-        if (height == null || height < 0 || height >= startPosition.y() || height >= finishPosition.y()) {
-            return;
+        if (height == null || height < 5 || height >= 40) {
+            throw new MazeException("Incorrect height");
+        }
+        if (height % 2 == 0) {
+            ++height;
         }
         this.height = height;
+        checkPositions();
     }
 
     private void setWidth() {
-        printHandler.printMessage("Input width: ");
+        printHandler.printMessage("Input odd width (5 < width < 40): ");
         Integer width = inputHandler.tryReadInteger();
-        if (width == null || width < 0 || width >= startPosition.x() || width >= finishPosition.x()) {
-            return;
+        if (width == null || width < 5 || width >= 40) {
+            throw new MazeException("Incorrect width");
+        }
+        if (width % 2 == 0) {
+            ++width;
         }
         this.width = width;
+        checkPositions();
+    }
+
+    private void checkPositions() {
+        if (startPosition != null && (height >= startPosition.y() || width >= startPosition.x())) {
+            startPosition = null;
+        }
+        if (finishPosition != null && (height >= finishPosition.y() || width >= finishPosition.x())) {
+            finishPosition = null;
+        }
     }
 }
