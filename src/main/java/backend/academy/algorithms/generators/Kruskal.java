@@ -9,55 +9,6 @@ import java.util.List;
 import java.util.Map;
 
 public class Kruskal implements GeneratorAlgorithm {
-    private static class Wall {
-        int y, x;
-        int cell1Y, cell1X;
-        int cell2Y, cell2X;
-
-        public Wall(int y, int x, int cell1Y, int cell1X, int cell2Y, int cell2X) {
-            this.y = y;
-            this.x = x;
-            this.cell1Y = cell1Y;
-            this.cell1X = cell1X;
-            this.cell2Y = cell2Y;
-            this.cell2X = cell2X;
-        }
-    }
-
-
-    private static class UnionFind {
-        private final Map<String, String> parent = new HashMap<>();
-
-        public void makeSet(int y, int x) {
-            String cell = y + "," + x;
-            parent.put(cell, cell);
-        }
-
-        public String find(int y, int x) {
-            String cell = y + "," + x;
-            if (!parent.containsKey(cell)) {
-                parent.put(cell, cell);
-            }
-            String root = parent.get(cell);
-            if (!root.equals(cell)) {
-                String[] coords = root.split(",");
-                int rootY = Integer.parseInt(coords[0]);
-                int rootX = Integer.parseInt(coords[1]);
-                root = find(rootY, rootX);
-                parent.put(cell, root); // Сжатие пути
-            }
-            return root;
-        }
-
-        public void union(int y1, int x1, int y2, int x2) {
-            String root1 = find(y1, x1);
-            String root2 = find(y2, x2);
-            if (!root1.equals(root2)) {
-                parent.put(root1, root2);
-            }
-        }
-    }
-
     public void execute(Maze maze) {
         int height = maze.height();
         int width = maze.width();
@@ -112,5 +63,57 @@ public class Kruskal implements GeneratorAlgorithm {
     @Override
     public String toString() {
         return "Kruskal";
+    }
+
+    private static final class Wall {
+        int y;
+        int x;
+        int cell1Y;
+        int cell1X;
+        int cell2Y;
+        int cell2X;
+
+        Wall(int y, int x, int cell1Y, int cell1X, int cell2Y, int cell2X) {
+            this.y = y;
+            this.x = x;
+            this.cell1Y = cell1Y;
+            this.cell1X = cell1X;
+            this.cell2Y = cell2Y;
+            this.cell2X = cell2X;
+        }
+    }
+
+
+    private static final class UnionFind {
+        private final Map<String, String> parent = new HashMap<>();
+
+        public void makeSet(int y, int x) {
+            String cell = y + "," + x;
+            parent.put(cell, cell);
+        }
+
+        public String find(int y, int x) {
+            String cell = y + "," + x;
+            if (!parent.containsKey(cell)) {
+                parent.put(cell, cell);
+            }
+            String root = parent.get(cell);
+            if (!root.equals(cell)) {
+                String[] coords = root.split(",");
+                int rootY = Integer.parseInt(coords[0]);
+                int rootX = Integer.parseInt(coords[1]);
+                root = find(rootY, rootX);
+                parent.put(cell, root); // Сжатие пути
+            }
+            return root;
+        }
+
+        public void union(int y1, int x1, int y2, int x2) {
+            String root1 = find(y1, x1);
+            String root2 = find(y2, x2);
+            if (!root1.equals(root2)) {
+                parent.put(root1, root2);
+            }
+        }
     }
 }

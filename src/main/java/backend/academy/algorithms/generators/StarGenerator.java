@@ -1,8 +1,8 @@
 package backend.academy.algorithms.generators;
 
 import backend.academy.algorithms.exceptions.GenerationErrorException;
-import backend.academy.models.Maze;
 import backend.academy.models.Cell;
+import backend.academy.models.Maze;
 import java.security.SecureRandom;
 
 public class StarGenerator implements GeneratorAlgorithm {

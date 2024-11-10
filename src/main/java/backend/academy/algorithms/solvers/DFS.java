@@ -1,14 +1,15 @@
 package backend.academy.algorithms.solvers;
 
 import backend.academy.algorithms.exceptions.NoWayFoundException;
-import backend.academy.models.Maze;
 import backend.academy.models.Cell;
+import backend.academy.models.Maze;
 
 public class DFS implements SolverAlgorithm {
     @Override
     public void execute(Maze maze) throws NoWayFoundException {
         boolean[][] visited = new boolean[maze.height()][maze.width()];
-        int startY = -1, startX = -1;
+        int startY = -1;
+        int startX = -1;
         boolean hasFinishPosition = false;
 
         for (int y = 0; y < maze.height(); y++) {
@@ -35,6 +36,7 @@ public class DFS implements SolverAlgorithm {
         }
     }
 
+    @SuppressWarnings("returncount")
     private boolean dfs(Maze maze, boolean[][] visited, int y, int x) {
         if (visited[y][x]) {
             return false;
@@ -46,7 +48,7 @@ public class DFS implements SolverAlgorithm {
             return true;
         }
 
-        if (y != 0 && dfs(maze, visited,y - 1, x)) {
+        if (y != 0 && dfs(maze, visited, y - 1, x)) {
             if (maze.getSurface(y, x) == Cell.PATHWAY) {
                 maze.setSurface(y, x, Cell.SOLUTION);
             }

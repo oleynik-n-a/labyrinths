@@ -1,8 +1,8 @@
 package backend.academy.algorithms.generators;
 
+import backend.academy.models.Cell;
 import backend.academy.models.Maze;
 import backend.academy.models.Position;
-import backend.academy.models.Cell;
 import java.security.SecureRandom;
 import java.util.Arrays;
 import java.util.Collections;
@@ -21,7 +21,8 @@ public class RecursiveBackTracker implements GeneratorAlgorithm {
     public void execute(Maze maze) {
         maze.clearMaze();
         SecureRandom random = new SecureRandom();
-        Position start = new Position(random.nextInt(maze.height() / 2) * 2 + 1, random.nextInt(maze.width() / 2) * 2 + 1);
+        Position start = new Position(random.nextInt(maze.height() / 2) * 2 + 1, random.nextInt(maze.width() / 2) * 2
+            + 1);
 
         dfs(maze, start.y(), start.x());
     }

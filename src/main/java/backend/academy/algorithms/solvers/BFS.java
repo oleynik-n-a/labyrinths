@@ -7,28 +7,17 @@ import java.util.LinkedList;
 import java.util.Queue;
 
 public class BFS implements SolverAlgorithm {
-    // Класс для представления позиции в лабиринте
-    static class Point {
-        public int y;
-        public int x;
-
-        public Point(int y, int x) {
-            this.y = y;
-            this.x = x;
-        }
-    }
+    private static final int DIRECTIONS_NUMBER = 4;
 
     @Override
+    @SuppressWarnings("cyclomaticcomplexity")
     public void execute(Maze maze) throws NoWayFoundException {
         int height = maze.height();
         int width = maze.width();
 
-        // Массив для отслеживания посещенных ячеек
         boolean[][] visited = new boolean[height][width];
-        // Массив для хранения предыдущей позиции для каждой ячейки
-        Point[][] prev = new Point[height][width]; // для восстановления пути
+        Point[][] prev = new Point[height][width];
 
-        // Поиск позиции START и FINISH
         int startY = -1;
         int startX = -1;
         int finishY = -1;
@@ -47,11 +36,9 @@ public class BFS implements SolverAlgorithm {
         }
 
         if (startY == -1 || startX == -1 || finishY == -1 || finishX == -1) {
-            // START или FINISH не найдены
             throw new NoWayFoundException("That is incomplete maze");
         }
 
-        // Инициализация очереди для BFS
         Queue<Point> queue = new LinkedList<>();
         queue.add(new Point(startY, startX));
         visited[startY][startX] = true;
@@ -62,21 +49,18 @@ public class BFS implements SolverAlgorithm {
             int y = current.y;
             int x = current.x;
 
-            // Проверка, достигли ли мы FINISH
             if (y == finishY && x == finishX) {
                 found = true;
                 break;
             }
 
-            // Проверка соседних ячеек
             int[] dy = {-1, 1, 0, 0};
             int[] dx = {0, 0, -1, 1};
 
-            for (int dir = 0; dir < 4; dir++) {
+            for (int dir = 0; dir < DIRECTIONS_NUMBER; dir++) {
                 int ny = y + dy[dir];
                 int nx = x + dx[dir];
 
-                // Проверка границ лабиринта
                 if (ny >= 0 && ny < height && nx >= 0 && nx < width) {
                     Cell neighborCell = maze.getSurface(ny, nx);
                     if (neighborCell != Cell.WALL && !visited[ny][nx]) {
@@ -89,12 +73,10 @@ public class BFS implements SolverAlgorithm {
         }
 
         if (found) {
-            // Восстановление пути от FINISH до START
             Point current = new Point(finishY, finishX);
             while (!(current.y == startY && current.x == startX)) {
                 Cell cell = maze.getSurface(current.y, current.x);
                 if (cell == Cell.PATHWAY) {
-                    // Изменение ячейки на SOLUTION
                     maze.setSurface(current.y, current.x, Cell.SOLUTION);
                 }
                 current = prev[current.y][current.x];
@@ -107,5 +89,15 @@ public class BFS implements SolverAlgorithm {
 
     public String toString() {
         return "BFS";
+    }
+
+    static class Point {
+        public int y;
+        public int x;
+
+        Point(int y, int x) {
+            this.y = y;
+            this.x = x;
+        }
     }
 }

@@ -34,14 +34,14 @@ public final class Generator {
 
     public void generate(Maze maze) {
         if (maze == null) {
-            throw new MazeException("Height or width not set");
+            throw new MazeException(ApplicationProcessor.NULL_MAZE_ERROR_MESSAGE);
         }
         algorithms[current].execute(maze);
     }
 
     public void generateStars(Maze maze) {
         if (maze == null) {
-            throw new MazeException("Height or width not set");
+            throw new MazeException(ApplicationProcessor.NULL_MAZE_ERROR_MESSAGE);
         }
         starGenerator.execute(maze);
     }

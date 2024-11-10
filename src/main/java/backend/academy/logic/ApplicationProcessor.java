@@ -1,9 +1,9 @@
 package backend.academy.logic;
 
 import backend.academy.algorithms.exceptions.MazeException;
+import backend.academy.models.Cell;
 import backend.academy.models.Maze;
 import backend.academy.models.Position;
-import backend.academy.models.Cell;
 import backend.academy.stream.handlers.InputHandler;
 import backend.academy.stream.handlers.PrintHandler;
 
@@ -18,6 +18,10 @@ public class ApplicationProcessor {
     private Integer width = null;
     private final Generator generator = new Generator();
     private final Solver solver = new Solver();
+
+    public static final String NULL_MAZE_ERROR_MESSAGE = "Height or width not set";
+    private static final int MIN_LABYRINTH_SIDE_SIZE = 5;
+    private static final int MAX_LABYRINTH_SIDE_SIZE = 40;
 
     public ApplicationProcessor(InputHandler inputHandler, PrintHandler printHandler) {
         this.inputHandler = inputHandler;
@@ -50,6 +54,7 @@ public class ApplicationProcessor {
         );
     }
 
+    @SuppressWarnings({"cyclomaticcomplexity", "magicnumber"})
     public void executeCommand(int num) {
         switch (num) {
             case 1:
@@ -82,7 +87,7 @@ public class ApplicationProcessor {
             case 10:
                 solver.solveWithStars(maze);
                 break;
-            case 11:
+            default:
                 System.exit(0);
         }
         if (height != null && width != null && (maze == null || maze.height() != height || maze.width() != width)) {
@@ -92,12 +97,12 @@ public class ApplicationProcessor {
 
     private Position setPosition() {
         if (height == null || width == null) {
-            throw new MazeException("Height or width not set");
+            throw new MazeException(NULL_MAZE_ERROR_MESSAGE);
         }
 
         printHandler.printMessage(String.format("Input y (0 < y < %d): ", height - 1));
         Integer y = inputHandler.tryReadInteger();
-        printHandler.printMessage(String.format("Input y (0 < y < %d): ", width - 1));
+        printHandler.printMessage(String.format("Input x (0 < x < %d): ", width - 1));
         Integer x = inputHandler.tryReadInteger();
 
         if (y == null || x == null || y < 0 || x < 0 || y >= height || x >= width) {
@@ -112,7 +117,7 @@ public class ApplicationProcessor {
 
     private void setStartPosition() {
         if (maze == null) {
-            throw new MazeException("Height or width not set");
+            throw new MazeException(NULL_MAZE_ERROR_MESSAGE);
         }
 
         startPosition = setPosition();
@@ -123,7 +128,7 @@ public class ApplicationProcessor {
 
     private void setFinishPosition() {
         if (maze == null) {
-            throw new MazeException("Height or width not set");
+            throw new MazeException(NULL_MAZE_ERROR_MESSAGE);
         }
 
         finishPosition = setPosition();
@@ -133,28 +138,30 @@ public class ApplicationProcessor {
     }
 
     private void setHeight() {
-        printHandler.printMessage("Input odd height (5 < height < 40): ");
-        Integer height = inputHandler.tryReadInteger();
-        if (height == null || height < 5 || height >= 40) {
+        printHandler.printMessage(String.format("Input odd height (%d < height < %d): ", MIN_LABYRINTH_SIDE_SIZE,
+            MAX_LABYRINTH_SIDE_SIZE));
+        Integer inputHeight = inputHandler.tryReadInteger();
+        if (inputHeight == null || inputHeight < MIN_LABYRINTH_SIDE_SIZE || inputHeight >= MAX_LABYRINTH_SIDE_SIZE) {
             throw new MazeException("Incorrect height");
         }
-        if (height % 2 == 0) {
-            ++height;
+        if (inputHeight % 2 == 0) {
+            ++inputHeight;
         }
-        this.height = height;
+        this.height = inputHeight;
         checkPositions();
     }
 
     private void setWidth() {
-        printHandler.printMessage("Input odd width (5 < width < 40): ");
-        Integer width = inputHandler.tryReadInteger();
-        if (width == null || width < 5 || width >= 40) {
+        printHandler.printMessage(String.format("Input odd width (%d < width < %d): ", MIN_LABYRINTH_SIDE_SIZE,
+            MAX_LABYRINTH_SIDE_SIZE));
+        Integer inputWidth = inputHandler.tryReadInteger();
+        if (inputWidth == null || inputWidth < MIN_LABYRINTH_SIDE_SIZE || inputWidth >= MAX_LABYRINTH_SIDE_SIZE) {
             throw new MazeException("Incorrect width");
         }
-        if (width % 2 == 0) {
-            ++width;
+        if (inputWidth % 2 == 0) {
+            ++inputWidth;
         }
-        this.width = width;
+        this.width = inputWidth;
         checkPositions();
     }
 
