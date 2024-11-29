@@ -12,6 +12,10 @@ public class Maze {
         }
     }
 
+    public Maze(Cell[][] cells) {
+        this.cells = cells;
+    }
+
     public int height() {
         return cells.length;
     }
