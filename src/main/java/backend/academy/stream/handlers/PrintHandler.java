@@ -5,7 +5,7 @@ import lombok.Getter;
 
 public final class PrintHandler {
     @Getter private static final PrintHandler INSTANCE = new PrintHandler();
-    static PrintStream printStream;
+    private static PrintStream printStream;
 
     private PrintHandler() {
     }

@@ -5,6 +5,4 @@ import backend.academy.models.Maze;
 
 public interface Algorithm {
     void execute(Maze maze) throws MazeException;
-
-    String toString();
 }
